@@ -117,6 +117,8 @@
         <DCCReference Include="Sources\LLPreview.pas"/>
         <DCCReference Include="Sources\cmbtLL30x.pas"/>
         <DCCReference Include="Sources\cmbtLS30x.pas"/>
+        <DCCReference Include="Sources\LlCoreRepository.pas"/>
+        <DCCReference Include="Sources\LlRepository.pas"/>
         <RcItem Include="Images\TLDesignerAction30.bmp">
             <ResourceType>BITMAP</ResourceType>
             <ResourceId>TLDesignerAction30</ResourceId>

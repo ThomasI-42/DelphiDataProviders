@@ -3,8 +3,8 @@ program LlRespositoryTest;
 uses
   Vcl.Forms,
   mainRepositoryTest in 'mainRepositoryTest.pas' {Form1},
-  LlCoreRepository in 'LlCoreRepository.pas',
-  LlRepository in 'LlRepository.pas';
+  LlCoreRepository in '..\Sources\LlCoreRepository.pas',
+  LlRepository in '..\Sources\LlRepository.pas';
 
 {$R *.res}
 

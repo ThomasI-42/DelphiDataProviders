@@ -104,8 +104,8 @@
             <Form>Form1</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="LlCoreRepository.pas"/>
-        <DCCReference Include="LlRepository.pas"/>
+        <DCCReference Include="..\Sources\LlCoreRepository.pas"/>
+        <DCCReference Include="..\Sources\LlRepository.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

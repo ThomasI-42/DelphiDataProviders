@@ -29,9 +29,7 @@ type
     property LastModification: TDateTime read getLastModification;
     property Stream: TStream read getStream;
   end;
-
   TRepositoryAttributes = set of (raSingleThreadedAttribute, raNoHierarchyAttribute);
-
   IRepository = interface
     ['{7814C978-3341-46B7-BA18-3610D3510B25}']
     function getAllItems(): TDictionary<String, IRepositoryItem>.TValueCollection;
@@ -41,8 +39,11 @@ type
     function LockItem(id: String): Boolean;
     procedure UnlockItem(id: String);
     function getAttributes: TRepositoryAttributes;
+    procedure setAttributes(value: TRepositoryAttributes);
     procedure CreateOrUpdateItem(item: IRepositoryItem);
+    procedure LoadAll;
 //    LoadItem(id, destinationStream, _loadItemCancelTokenSource.Token);
+    property Attributes: TRepositoryAttributes read getAttributes write setAttributes;
   end;
 
   TRepositoryItem = class(TInterfacedObject, IRepositoryItem)
@@ -82,6 +83,7 @@ type
   TBaseRepository = class(TInterfacedObject, IRepository)
   protected
     FItems: TDictionary<String, IRepositoryItem>;
+    FAttributes: TRepositoryAttributes;
     procedure AfterCreateOrUpdateItem(item: IRepositoryItem); virtual;
   public
     constructor Create; virtual;
@@ -93,7 +95,10 @@ type
     function LockItem(id: String): Boolean;
     procedure UnlockItem(id: String);
     function getAttributes: TRepositoryAttributes;
+    procedure setAttributes(value: TRepositoryAttributes);
     procedure CreateOrUpdateItem(item: IRepositoryItem);
+    procedure LoadAll; virtual;
+    property Attributes: TRepositoryAttributes read getAttributes write setAttributes;
   end;
 
   TDBBaseRepository = class(TBaseRepository)
@@ -110,7 +115,7 @@ type
     procedure AddItem(ADataSet: TDataSet);
   public
     constructor Create; override;
-    procedure LoadAll;
+    procedure LoadAll; override;
     property Datasource: TDataSource read FDataSource write FDataSource;
     property FieldNameId: String read FFieldNameId write FFieldNameId;
     property FieldNameType: String read FFieldNameType write FFieldNameType;
@@ -269,6 +274,7 @@ end;
 constructor TBaseRepository.Create;
 begin
   FItems := TDictionary<String, IRepositoryItem>.Create;
+  FAttributes := [];
 end;
 
 procedure TBaseRepository.CreateOrUpdateItem(item: IRepositoryItem);
@@ -306,8 +312,7 @@ end;
 
 function TBaseRepository.getAttributes: TRepositoryAttributes;
 begin
-  // TODO ??
-  Result := [];
+  Result := FAttributes;
 end;
 
 function TBaseRepository.getItem(id: String): IRepositoryItem;
@@ -321,11 +326,21 @@ begin
   end;
 end;
 
+procedure TBaseRepository.LoadAll;
+begin
+  //
+end;
+
 function TBaseRepository.LockItem(id: String): Boolean;
 begin
   //TODO
   // to be implemented
   Result := True;
+end;
+
+procedure TBaseRepository.setAttributes(value: TRepositoryAttributes);
+begin
+  FAttributes := value;
 end;
 
 procedure TBaseRepository.UnlockItem(id: String);

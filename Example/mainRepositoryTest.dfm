@@ -12,6 +12,13 @@ object Form1: TForm1
   Font.Style = []
   OnCreate = FormCreate
   TextHeight = 15
+  object Label1: TLabel
+    Left = 64
+    Top = 16
+    Width = 27
+    Height = 15
+    Caption = 'Repo'
+  end
   object bPreview: TButton
     Left = 64
     Top = 56
@@ -38,6 +45,14 @@ object Form1: TForm1
     Caption = 'Print'
     TabOrder = 2
     OnClick = bPrintClick
+  end
+  object eRepo: TEdit
+    Left = 122
+    Top = 13
+    Width = 375
+    Height = 23
+    TabOrder = 3
+    Text = 'repository://{CB96EAEA-8957-4967-8A9F-E197201EFE85}'
   end
   object ListLabel281: TListLabel28
     AutoProjectFile = 'Test'
