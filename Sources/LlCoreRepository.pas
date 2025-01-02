@@ -5,6 +5,7 @@ uses
   System.SysUtils, System.Classes, System.Variants,
   Winapi.Windows, Winapi.ActiveX,
   LlRepository;
+
 type
   // Repository Item Info Enumeration
   TRepositoryItemInfo = (
@@ -14,11 +15,13 @@ type
     riThreadedAccess = 4,
     riSupportsHierarchy = 5
   );
-    // ILlRepositoryItemSink Definition
+
+  // ILlRepositoryItemSink Definition
   ILlRepositoryItemSink = interface(IUnknown)
     ['{0B14D53F-8907-41D6-A0E6-95C1E812E31A}']
     function DefineItem(const id, itemDescriptor: WideString): HRESULT; stdcall;
   end;
+
   // Interface Definition for ILlRepository
   ILlRepository = interface(IUnknown)
     ['{46433E33-1C0D-4D46-AC44-F72F87870C55}']
@@ -31,18 +34,20 @@ type
     function Lock(debugSink: Pointer; id: PWideChar): HRESULT; stdcall;
     function Unlock(debugSink: Pointer; id: PWideChar): HRESULT; stdcall;
   end;
+
   // Logger Interface
   ILlLogger = interface
     ['{27936F33-EA8C-4C5D-AE08-E083B8F572F3}']
     procedure Error(const category, message: WideString; params: array of const); stdcall;
   end;
+
   // Main LlCoreRepository Class
   TLlCoreRepository = class(TInterfacedObject, ILlRepository)
   private
-    FRepository: IRepository;
+    FRepository: ILlBaseRepository;
     FExternalLogger: ILlLogger;
   public
-    constructor Create(repository: IRepository);
+    constructor Create(repository: ILlBaseRepository);
     //constructor Create();
     destructor Destroy; override;
     // ILlRepository Implementation
@@ -57,9 +62,11 @@ type
     procedure SetLogger(logger: ILlLogger; overrideExisting: Boolean); stdcall;
   end;
 implementation
+
 uses System.Win.ComObj;
+
 { TLlCoreRepository }
-constructor TLlCoreRepository.Create(repository: IRepository);
+constructor TLlCoreRepository.Create(repository: ILlBaseRepository);
 begin
   if repository = nil then
   begin
@@ -73,10 +80,11 @@ begin
   FRepository := nil;
   inherited Destroy;
 end;
+
 function TLlCoreRepository.DefineItems(debugSink: Pointer; folderId: PWideChar; itemsList: ILlRepositoryItemSink): HRESULT;
 var
   lastItem: String;
-  item: IRepositoryItem;
+  item: ILlRepositoryItem;
   hr: HRESULT;
 begin
   try
@@ -106,9 +114,10 @@ begin
     // in c#  Marshal.ReleaseComObject(itemsList);
   end;
 end;
+
 function TLlCoreRepository.Load(debugSink: Pointer; id: PWideChar; destinationStream: Pointer): HRESULT;
 var
-  repositoryItem: IRepositoryItem;
+  repositoryItem: ILlRepositoryItem;
 begin
   try
     if destinationStream = nil then
@@ -153,12 +162,13 @@ begin
     end;
   end;
 end;
+
 function TLlCoreRepository.Save(debugSink: Pointer; id, itemType, userDefinedID: PWideChar; nativeStream: Pointer; itemDescriptor: PWideChar): HRESULT;
 var
-  repositoryItem: IRepositoryItem;
+  repositoryItem: ILlRepositoryItem;
 begin
   try
-    repositoryItem := TRepositoryItem.Create(id, itemDescriptor, itemType, Now(), IStream(nativeStream));
+    repositoryItem := TLlRepositoryItem.Create(id, itemDescriptor, itemType, Now(), IStream(nativeStream));
     FRepository.CreateOrUpdateItem(repositoryItem);
 
     Result := S_OK;
@@ -171,6 +181,7 @@ begin
     end;
   end;
 end;
+
 function TLlCoreRepository.Delete(debugSink: Pointer; id: PWideChar): HRESULT;
 begin
   try
@@ -188,10 +199,11 @@ begin
     end;
   end;
 end;
+
 function TLlCoreRepository.GetInfo(debugSink: Pointer; id: PWideChar; infoType: Integer; var info: OleVariant): HRESULT;
 var
   aInfoType: TRepositoryItemInfo;
-  repositoryItem: IRepositoryItem;
+  repositoryItem: ILlRepositoryItem;
 begin
   try
     aInfoType := TRepositoryItemInfo(infoType);
@@ -264,6 +276,7 @@ begin
     end;
   end;
 end;
+
 function TLlCoreRepository.AbortLoad(debugSink: Pointer; id: PWideChar): HRESULT;
 begin
   try
@@ -296,6 +309,7 @@ begin
     end;
   end;
 end;
+
 function TLlCoreRepository.Lock(debugSink: Pointer; id: PWideChar): HRESULT;
 begin
   try
@@ -312,6 +326,7 @@ begin
     end;
   end;
 end;
+
 function TLlCoreRepository.Unlock(debugSink: Pointer; id: PWideChar): HRESULT;
 begin
   try
@@ -326,6 +341,7 @@ begin
     end;
   end;
 end;
+
 procedure TLlCoreRepository.SetLogger(logger: ILlLogger; overrideExisting: Boolean);
 begin
   if (FExternalLogger = nil) or overrideExisting then

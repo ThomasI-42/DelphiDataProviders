@@ -9,7 +9,7 @@ uses
   Data.DB;
 
 type
-  IRepositoryItem = interface
+  ILlRepositoryItem = interface
     ['{9FD3B4AA-3B08-4D96-8FC5-F827AA84B393}']
     function getInternalID: String;
     function getType: String;
@@ -20,7 +20,7 @@ type
 
     procedure saveToIStream(dest: IStream);
     procedure loadFromIStream(source: IStream);
-    procedure UpdateFrom(source: IRepositoryItem);
+    procedure UpdateFrom(source: ILlRepositoryItem);
 
     property InternalID: String read getInternalID;
     property AType: String read getType;
@@ -29,24 +29,48 @@ type
     property LastModification: TDateTime read getLastModification;
     property Stream: TStream read getStream;
   end;
-  TRepositoryAttributes = set of (raSingleThreadedAttribute, raNoHierarchyAttribute);
-  IRepository = interface
+
+  TLlRepositoryAttributes = set of (raSingleThreadedAttribute, raNoHierarchyAttribute);
+
+  ILlBaseRepository = interface
     ['{7814C978-3341-46B7-BA18-3610D3510B25}']
-    function getAllItems(): TDictionary<String, IRepositoryItem>.TValueCollection;
-    function getItem(id: String): IRepositoryItem;
+    function getAllItems(): TDictionary<String, ILlRepositoryItem>.TValueCollection;
+    function getItem(id: String): ILlRepositoryItem;
     procedure DeleteItem(id: String);
     function ContainsItem(id: String): Boolean;
     function LockItem(id: String): Boolean;
     procedure UnlockItem(id: String);
-    function getAttributes: TRepositoryAttributes;
-    procedure setAttributes(value: TRepositoryAttributes);
-    procedure CreateOrUpdateItem(item: IRepositoryItem);
-    procedure LoadAll;
+    function getAttributes: TLlRepositoryAttributes;
+    procedure setAttributes(value: TLlRepositoryAttributes);
+    procedure CreateOrUpdateItem(item: ILlRepositoryItem);
 //    LoadItem(id, destinationStream, _loadItemCancelTokenSource.Token);
-    property Attributes: TRepositoryAttributes read getAttributes write setAttributes;
+    property Attributes: TLlRepositoryAttributes read getAttributes write setAttributes;
   end;
 
-  TRepositoryItem = class(TInterfacedObject, IRepositoryItem)
+  ILlDBRepositry = interface(ILlBaseRepository)
+    ['{5DAF1512-96EA-47E2-A4ED-3ADF0DF16F19}']
+    procedure LoadAll;
+    function getDataSource: TDataSource;
+    procedure setDataSource(value: TDataSource);
+    function getFieldNameId: String;
+    procedure setFieldNameId(value: String);
+    function getFieldNameType: String;
+    procedure setFieldNameType(value: String);
+    function getFieldNameDescriptor: String;
+    procedure setFieldNameDescriptor(value: String);
+    function getFieldNameLastModification: String;
+    procedure setFieldNameLastModification(value: String);
+    function getFieldNameStream: String;
+    procedure setFieldNameStream(value: String);
+    property FieldNameId: String read getFieldNameId write setFieldNameId;
+    property FieldNameType: String read getFieldNameType write setFieldNameType;
+    property FieldNameDescriptor: String read getFieldNameDescriptor write setFieldNameDescriptor;
+    property FieldNameLastModification: String read getFieldNameLastModification write setFieldNameLastModification;
+    property FieldNameStream: String read getFieldNameStream write setFieldNameStream;
+    property DataSource: TDataSource read getDataSource write setDataSource;
+  end;
+
+  TLlRepositoryItem = class(TInterfacedObject, ILlRepositoryItem)
   private
     FFolderId: String;
     FInternalId: String;
@@ -70,7 +94,7 @@ type
     procedure saveToIStream(dest: IStream);
     procedure loadFromIStream(source: IStream);
 
-    procedure UpdateFrom(source: IRepositoryItem);
+    procedure UpdateFrom(source: ILlRepositoryItem);
 
     property InternalID: String read getInternalID;
     property AType: String read getType;
@@ -80,28 +104,27 @@ type
     property Stream: TStream read getStream;
   end;
 
-  TBaseRepository = class(TInterfacedObject, IRepository)
+  TLlBaseRepository = class(TInterfacedObject, ILlBaseRepository)
   protected
-    FItems: TDictionary<String, IRepositoryItem>;
-    FAttributes: TRepositoryAttributes;
-    procedure AfterCreateOrUpdateItem(item: IRepositoryItem); virtual;
+    FItems: TDictionary<String, ILlRepositoryItem>;
+    FAttributes: TLlRepositoryAttributes;
+    procedure AfterCreateOrUpdateItem(item: ILlRepositoryItem); virtual;
   public
     constructor Create; virtual;
     destructor Destroy; override;
-    function getAllItems(): TDictionary<String, IRepositoryItem>.TValueCollection;
-    function getItem(id: String): IRepositoryItem;
-    procedure DeleteItem(id: String);
+    function getAllItems(): TDictionary<String, ILlRepositoryItem>.TValueCollection;
+    function getItem(id: String): ILlRepositoryItem;
+    procedure DeleteItem(id: String); virtual;
     function ContainsItem(id: String): Boolean;
     function LockItem(id: String): Boolean;
     procedure UnlockItem(id: String);
-    function getAttributes: TRepositoryAttributes;
-    procedure setAttributes(value: TRepositoryAttributes);
-    procedure CreateOrUpdateItem(item: IRepositoryItem);
-    procedure LoadAll; virtual;
-    property Attributes: TRepositoryAttributes read getAttributes write setAttributes;
+    function getAttributes: TLlRepositoryAttributes;
+    procedure setAttributes(value: TLlRepositoryAttributes);
+    procedure CreateOrUpdateItem(item: ILlRepositoryItem);
+    property Attributes: TLlRepositoryAttributes read getAttributes write setAttributes;
   end;
 
-  TDBBaseRepository = class(TBaseRepository)
+  TLlDBBaseRepository = class(TLlBaseRepository, ILlDBRepositry)
   private
   protected
     FDataSource: TDataSource;
@@ -111,24 +134,40 @@ type
     FFieldNameLastModification: String;
     FFieldNameStream: String;
 
-    procedure AfterCreateOrUpdateItem(item: IRepositoryItem); override;
+    procedure AfterCreateOrUpdateItem(item: ILlRepositoryItem); override;
     procedure AddItem(ADataSet: TDataSet);
   public
     constructor Create; override;
-    procedure LoadAll; override;
-    property Datasource: TDataSource read FDataSource write FDataSource;
-    property FieldNameId: String read FFieldNameId write FFieldNameId;
-    property FieldNameType: String read FFieldNameType write FFieldNameType;
-    property FieldNameDescriptor: String read FFieldNameDescriptor write FFieldNameDescriptor;
-    property FieldNameLastModification: String read FFieldNameLastModification write FFieldNameLastModification;
-    property FieldNameStream: String read FFieldNameStream write FFieldNameStream;
+
+    function getDataSource: TDataSource;
+    procedure setDataSource(value: TDataSource);
+    function getFieldNameId: String;
+    procedure setFieldNameId(value: String);
+    function getFieldNameType: String;
+    procedure setFieldNameType(value: String);
+    function getFieldNameDescriptor: String;
+    procedure setFieldNameDescriptor(value: String);
+    function getFieldNameLastModification: String;
+    procedure setFieldNameLastModification(value: String);
+    function getFieldNameStream: String;
+    procedure setFieldNameStream(value: String);
+
+    procedure LoadAll;
+    procedure DeleteItem(id: String); override;
+
+    property FieldNameId: String read getFieldNameId write setFieldNameId;
+    property FieldNameType: String read getFieldNameType write setFieldNameType;
+    property FieldNameDescriptor: String read getFieldNameDescriptor write setFieldNameDescriptor;
+    property FieldNameLastModification: String read getFieldNameLastModification write setFieldNameLastModification;
+    property FieldNameStream: String read getFieldNameStream write setFieldNameStream;
+    property DataSource: TDataSource read getDataSource write setDataSource;
   end;
 
 implementation
 
-{ TRepositoryItem }
+{ TLlRepositoryItem }
 
-constructor TRepositoryItem.Create(AId, AItemDescriptor, AType: String;
+constructor TLlRepositoryItem.Create(AId, AItemDescriptor, AType: String;
   ADate: TDateTime; AIStream: IStream);
 begin
   inherited Create;
@@ -140,7 +179,7 @@ begin
   loadFromIStream(AIStream);
 end;
 
-constructor TRepositoryItem.Create(AId, AItemDescriptor, AType: String;
+constructor TLlRepositoryItem.Create(AId, AItemDescriptor, AType: String;
   ADate: TDateTime; AStream: TStream);
 begin
   inherited Create;
@@ -152,7 +191,7 @@ begin
   setStream(AStream);
 end;
 
-constructor TRepositoryItem.Create(AId, AItemDescriptor, AType: String;
+constructor TLlRepositoryItem.Create(AId, AItemDescriptor, AType: String;
   ADate: TDateTime);
 begin
   inherited Create;
@@ -163,43 +202,43 @@ begin
   FLastModification := ADate;
 end;
 
-destructor TRepositoryItem.Destroy;
+destructor TLlRepositoryItem.Destroy;
 begin
   FStream.Free;
   inherited Destroy;
 end;
 
-function TRepositoryItem.getDescriptor: String;
+function TLlRepositoryItem.getDescriptor: String;
 begin
   Result := FDescriptor;
 end;
 
-function TRepositoryItem.getFolderId: String;
+function TLlRepositoryItem.getFolderId: String;
 begin
   Result := FFolderId;
 end;
 
-function TRepositoryItem.getInternalID: String;
+function TLlRepositoryItem.getInternalID: String;
 begin
   Result := FInternalId;
 end;
 
-function TRepositoryItem.getLastModification: TDateTime;
+function TLlRepositoryItem.getLastModification: TDateTime;
 begin
   Result := FLastModification;
 end;
 
-function TRepositoryItem.getStream: TStream;
+function TLlRepositoryItem.getStream: TStream;
 begin
   Result := FStream;
 end;
 
-function TRepositoryItem.getType: String;
+function TLlRepositoryItem.getType: String;
 begin
   Result := FType;
 end;
 
-procedure TRepositoryItem.loadFromIStream(source: IStream);
+procedure TLlRepositoryItem.loadFromIStream(source: IStream);
 const
   BufferSize = 4096;
 var
@@ -218,7 +257,7 @@ begin
   FStream.Position := 0;
 end;
 
-procedure TRepositoryItem.saveToIStream(dest: IStream);
+procedure TLlRepositoryItem.saveToIStream(dest: IStream);
 var
   Buffer: array[0..4095] of Byte;
   BytesRead: Integer;
@@ -236,7 +275,7 @@ begin
   until BytesRead = 0;
 end;
 
-procedure TRepositoryItem.setStream(value: TStream);
+procedure TLlRepositoryItem.setStream(value: TStream);
 begin
   if value = nil then
   begin
@@ -247,7 +286,7 @@ begin
   end;
 end;
 
-procedure TRepositoryItem.UpdateFrom(source: IRepositoryItem);
+procedure TLlRepositoryItem.UpdateFrom(source: ILlRepositoryItem);
 begin
   if SameText(FInternalId, source.InternalID) then
   begin
@@ -259,27 +298,27 @@ begin
   end;
 end;
 
-{ TBaseRepository }
+{ TLlBaseRepository }
 
-procedure TBaseRepository.AfterCreateOrUpdateItem(item: IRepositoryItem);
+procedure TLlBaseRepository.AfterCreateOrUpdateItem(item: ILlRepositoryItem);
 begin
   // use in derivation
 end;
 
-function TBaseRepository.ContainsItem(id: String): Boolean;
+function TLlBaseRepository.ContainsItem(id: String): Boolean;
 begin
   Result := FItems.ContainsKey(id);
 end;
 
-constructor TBaseRepository.Create;
+constructor TLlBaseRepository.Create;
 begin
-  FItems := TDictionary<String, IRepositoryItem>.Create;
+  FItems := TDictionary<String, ILlRepositoryItem>.Create;
   FAttributes := [];
 end;
 
-procedure TBaseRepository.CreateOrUpdateItem(item: IRepositoryItem);
+procedure TLlBaseRepository.CreateOrUpdateItem(item: ILlRepositoryItem);
 var
-  repositoryItem: IRepositoryItem;
+  repositoryItem: ILlRepositoryItem;
 begin
   if FItems.ContainsKey(item.InternalID) then
   begin
@@ -295,29 +334,29 @@ begin
   end;
 end;
 
-procedure TBaseRepository.DeleteItem(id: String);
+procedure TLlBaseRepository.DeleteItem(id: String);
 begin
   FItems.Remove(id);
 end;
 
-destructor TBaseRepository.Destroy;
+destructor TLlBaseRepository.Destroy;
 begin
   FItems.Free;
 end;
 
-function TBaseRepository.getAllItems: TDictionary<String, IRepositoryItem>.TValueCollection;
+function TLlBaseRepository.getAllItems: TDictionary<String, ILlRepositoryItem>.TValueCollection;
 begin
   Result := FItems.Values;
 end;
 
-function TBaseRepository.getAttributes: TRepositoryAttributes;
+function TLlBaseRepository.getAttributes: TLlRepositoryAttributes;
 begin
   Result := FAttributes;
 end;
 
-function TBaseRepository.getItem(id: String): IRepositoryItem;
+function TLlBaseRepository.getItem(id: String): ILlRepositoryItem;
 var
-  repositoryItem: IRepositoryItem;
+  repositoryItem: ILlRepositoryItem;
 begin
   Result := nil;
   if FItems.TryGetValue(id, repositoryItem) then
@@ -326,39 +365,34 @@ begin
   end;
 end;
 
-procedure TBaseRepository.LoadAll;
-begin
-  //
-end;
-
-function TBaseRepository.LockItem(id: String): Boolean;
+function TLlBaseRepository.LockItem(id: String): Boolean;
 begin
   //TODO
   // to be implemented
   Result := True;
 end;
 
-procedure TBaseRepository.setAttributes(value: TRepositoryAttributes);
+procedure TLlBaseRepository.setAttributes(value: TLlRepositoryAttributes);
 begin
   FAttributes := value;
 end;
 
-procedure TBaseRepository.UnlockItem(id: String);
+procedure TLlBaseRepository.UnlockItem(id: String);
 begin
   //TODO
   // to be implemented
 end;
 
-{ TDBBaseRepository }
+{ TLlDBBaseRepository }
 
-procedure TDBBaseRepository.AddItem(ADataSet: TDataSet);
+procedure TLlDBBaseRepository.AddItem(ADataSet: TDataSet);
 var
-  item: IRepositoryItem;
+  item: ILlRepositoryItem;
   ms: TStream;
 begin
   if ADataSet.FieldByName(FFieldNameStream).IsNull then
   begin
-    item := TRepositoryItem.Create(
+    item := TLlRepositoryItem.Create(
           ADataSet.FieldByName(FFieldNameId).AsString,
           ADataSet.FieldByName(FFieldNameDescriptor).AsString,
           ADataSet.FieldByName(FFieldNameType).AsString,
@@ -368,7 +402,7 @@ begin
     ms := TMemoryStream.Create;
     try
       (ADataSet.FieldByName(FFieldNameStream)as TBlobField).SaveToStream(ms);
-        item := TRepositoryItem.Create(
+        item := TLlRepositoryItem.Create(
             ADataSet.FieldByName(FFieldNameId).AsString,
             ADataSet.FieldByName(FFieldNameDescriptor).AsString,
             ADataSet.FieldByName(FFieldNameType).AsString,
@@ -382,7 +416,7 @@ begin
   FItems.Add(ADataSet.FieldByName(FFieldNameId).AsString, item);
 end;
 
-procedure TDBBaseRepository.AfterCreateOrUpdateItem(item: IRepositoryItem);
+procedure TLlDBBaseRepository.AfterCreateOrUpdateItem(item: ILlRepositoryItem);
 var
   ds: TDataSet;
 begin
@@ -392,7 +426,7 @@ begin
     if FDataSource.DataSet <> nil then
     begin
       ds := FDataSource.DataSet;
-      if ds.Locate(FFieldNameId, item.InternalID, []) then
+      if ds.Locate(FFieldNameId, item.InternalID, [loCaseInsensitive]) then
       begin
         ds.Edit;
       end else
@@ -415,7 +449,7 @@ begin
   end;
 end;
 
-constructor TDBBaseRepository.Create;
+constructor TLlDBBaseRepository.Create;
 begin
   inherited;
 
@@ -426,7 +460,55 @@ begin
   FFieldNameStream := 'Stream';
 end;
 
-procedure TDBBaseRepository.LoadAll;
+procedure TLlDBBaseRepository.DeleteItem(id: String);
+var
+  ds: TDataSet;
+begin
+  inherited;
+  if FDataSource <> nil then
+  begin
+    if FDataSource.DataSet <> nil then
+    begin
+      ds := FDataSource.DataSet;
+      if ds.Locate(FFieldNameId, id, [loCaseInsensitive]) then
+      begin
+        ds.Delete;
+      end;
+    end;
+  end;
+end;
+
+function TLlDBBaseRepository.getDataSource: TDataSource;
+begin
+  Result := FDataSource;
+end;
+
+function TLlDBBaseRepository.getFieldNameDescriptor: String;
+begin
+  Result := FFieldNameDescriptor;
+end;
+
+function TLlDBBaseRepository.getFieldNameId: String;
+begin
+  Result := FFieldNameId;
+end;
+
+function TLlDBBaseRepository.getFieldNameLastModification: String;
+begin
+  Result := FFieldNameLastModification;
+end;
+
+function TLlDBBaseRepository.getFieldNameStream: String;
+begin
+  Result := FFieldNameStream;
+end;
+
+function TLlDBBaseRepository.getFieldNameType: String;
+begin
+  Result := FFieldNameType;
+end;
+
+procedure TLlDBBaseRepository.LoadAll;
 begin
   if FDataSource <> nil then
   begin
@@ -448,6 +530,36 @@ begin
   begin
     raise Exception.Create('Datasource is nil');
   end;
+end;
+
+procedure TLlDBBaseRepository.setDataSource(value: TDataSource);
+begin
+  FDataSource := value;
+end;
+
+procedure TLlDBBaseRepository.setFieldNameDescriptor(value: String);
+begin
+  FFieldNameDescriptor := value;
+end;
+
+procedure TLlDBBaseRepository.setFieldNameId(value: String);
+begin
+  FFieldNameId := value;
+end;
+
+procedure TLlDBBaseRepository.setFieldNameLastModification(value: String);
+begin
+  FFieldNameLastModification := value;
+end;
+
+procedure TLlDBBaseRepository.setFieldNameStream(value: String);
+begin
+  FFieldNameStream := value;
+end;
+
+procedure TLlDBBaseRepository.setFieldNameType(value: String);
+begin
+  FFieldNameType := value;
 end;
 
 end.
