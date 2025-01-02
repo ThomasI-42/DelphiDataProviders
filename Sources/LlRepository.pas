@@ -47,7 +47,7 @@ type
     property Attributes: TLlRepositoryAttributes read getAttributes write setAttributes;
   end;
 
-  ILlDBRepositry = interface(ILlBaseRepository)
+  ILlDBBaseRepositry = interface(ILlBaseRepository)
     ['{5DAF1512-96EA-47E2-A4ED-3ADF0DF16F19}']
     procedure LoadAll;
     function getDataSource: TDataSource;
@@ -124,7 +124,7 @@ type
     property Attributes: TLlRepositoryAttributes read getAttributes write setAttributes;
   end;
 
-  TLlDBBaseRepository = class(TLlBaseRepository, ILlDBRepositry)
+  TLlDBBaseRepository = class(TLlBaseRepository, ILlDBBaseRepositry)
   private
   protected
     FDataSource: TDataSource;

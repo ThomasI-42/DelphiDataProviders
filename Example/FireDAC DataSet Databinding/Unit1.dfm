@@ -74,9 +74,9 @@ object Form1: TForm1
     Height = 33
     AutoSize = False
     Caption = 
-      'Use Repository'#8221' saves the report design in the database. When us' +
-      'ing it for the first time, import the .lst file and save it agai' +
-      'n'
+      '"Use Repository'#8221' saves the report design in the database. When u' +
+      'sing it for the first time, import the .lst file and save it aga' +
+      'in'
     WordWrap = True
   end
   object Label4: TLabel

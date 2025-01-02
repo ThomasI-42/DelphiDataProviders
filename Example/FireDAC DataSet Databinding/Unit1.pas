@@ -47,7 +47,7 @@ type
     procedure cbUseRepositoryClick(Sender: TObject);
   private
     { Private declarations }
-    FRepository: IRepository;
+    FDbRepository: ILlDBBaseRepositry;
     FCoreRepository: ILlRepository;
     procedure CreateRepositoryTable;
   public
@@ -134,14 +134,14 @@ procedure TForm1.cbUseRepositoryClick(Sender: TObject);
 begin
   if cbUseRepository.Checked then
   begin
-    FRepository := TDBBaseRepository.Create;
-    FRepository.Attributes := [];
-    (FRepository as TDBBaseRepository).Datasource := DataSourceRepository;
-    FRepository.LoadAll;
-    FCoreRepository := TLlCoreRepository.Create(FRepository);
+    FDbRepository := TLlDBBaseRepository.Create;
+    FDbRepository.Attributes := [];
+    FDbRepository.Datasource := DataSourceRepository;
+    FDbRepository.LoadAll;
+    FCoreRepository := TLlCoreRepository.Create(FDbRepository);
   end else
   begin
-    FRepository := nil;
+    FDbRepository := nil;
     FCoreRepository := nil;
     ListLabel.Core.LlSetOption(LL_OPTION_ILLREPOSITORY, 0);
   end;
