@@ -1,6 +1,6 @@
 (* Pascal/Delphi runtime linkage constants and function definitions for LL30.DLL *)
 (*  (c) combit GmbH *)
-(*  [build of 2024-09-18 22:09:05] *)
+(*  [build of 2025-08-19 22:08:14] *)
 
 unit cmbtLL30x;
 
@@ -68,6 +68,7 @@ type
   _PCDEVMODE                     = ^TDEVICEMODE;
   _PCDEVMODEA                    = ^TDEVICEMODEA;
   _PCDEVMODEW                    = ^TDEVICEMODEW;
+  _PBSTR                         = PBStr;
   PSCLLCOLUMN                    = ^scLlColumn;
   CTL_GUID                       = tGUID;
   CTL_PGUID                      = ^tGUID;
@@ -456,7 +457,7 @@ const
   LL_JOBOPENFLAG_ONLYEXACTLANGUAGE = $00002000;
                     (* do not look for '@@' LNG file *)
   LL_JOBHANDLE_FLAG_NOTHREADCHECK = $40000000;
-  LL_JOBHANDLE_IDMASK            = $00000fff;
+  LL_JOBHANDLE_IDMASK            = $0fffffff;
   LL_DEBUG_CMBTLL                = $0001;
                     (* debug CMBTLLnn.DLL *)
   LL_DEBUG_CMBTDWG               = $0002;
@@ -854,6 +855,13 @@ const
   LL_PDF                         = $00400000;
   LL_INPUTOBJECT                 = $00200000;
                     (* internal use only *)
+  LL_INPUTOBJECT_EDIT            = $00200000;
+  LL_INPUTOBJECT_CHECKBOX        = $00200001;
+  LL_INPUTOBJECT_COMBOBOX        = $00200002;
+  LL_INPUTOBJECT_BUTTON          = $00200003;
+  LL_INPUTOBJECT_RADIOGROUP      = $00200004;
+  LL_INPUTOBJECT_LISTBOX         = $00200005;
+  LL_INPUTOBJECT_TYPEMASK        = $000000ff;
   LL_LLXOBJECT                   = $00100000;
                     (* internal use only *)
   LL_SUBTABLELIST                = $00080000;
@@ -1555,7 +1563,11 @@ const
                     (* default: LL_TEMPFILESTRATEGY_SPEED *)
   LL_TEMPFILESTRATEGY_SPEED      = 0;
   LL_TEMPFILESTRATEGY_SIZE       = 1;
+                    (*  % files are set empty (length 0 bytes) before allowing to re-use them *)
   LL_TEMPFILESTRATEGY_SECURITY   = 2;
+                    (*  % file contents are being overwritten before setting the file empty *)
+  LL_TEMPFILESTRATEGY_DELETE     = 3;
+                    (*  % files are deleted after use, no caching of filenames *)
   LL_OPTION_RTF_WHITE_BACKGROUND_IS_TRANSPARENT = 239;
                     (* default: TRUE (!) *)
   LL_OPTION_NO_DOTTED_LINE_ON_SECONDARY_AXIS = 240;
@@ -1726,6 +1738,7 @@ const
                     (* default: LL_TREEVIEWFILTER_IN_ALL_TREES *)
   LL_TREEVIEWFILTER_IN_VARTREE   = $0001;
   LL_TREEVIEWFILTER_IN_FCTWIZARD_VARTREE = $0002;
+  LL_TREEVIEWFILTER_IN_TABLESTRUCTWIN = $0004;
   LL_TREEVIEWFILTER_IN_ALL_TREES = $ffff;
   LL_OPTION_COMPAT_ALLOW_INVALID_CHARS_IN_SINGLEFIELDFORMULA = 319;
                     (* default: FALSE *)
@@ -1970,6 +1983,38 @@ const
   LL_OPTION_CHARTLEGEND_ALLOWMIXEDLINETYPESYMBOLS = 425;
                     (* default: false *)
   LL_OPTION_USEDIDENTIFIERS_SCANFORFILENAMES = 426;
+                    (* default: false *)
+  LL_OPTION_ALLOW_TIME_IN_REPORTPARAMETER = 427;
+                    (* default: false  *)
+  LL_OPTION_COMPAT_NUMERIC_SIGN_ONLY_IS_ZERO = 428;
+                    (* default: false *)
+  LL_OPTION_PROHIBIT_DESIGNER_CACHING_TEXTOBJECTS = 429;
+                    (* default: false *)
+  LL_OPTION_COMPAT_SET_FIRST_USER_DEFINE_PAPER_INDEX_TO_DMPAPER_USER = 430;
+                    (* default: false *)
+  LL_OPTION_USE_SVG2EMF_OOPS     = 431;
+                    (* default: false *)
+  LL_OPTION_ENABLE_NESTEDTABLE_IN_FOOTERLINES = 432;
+                    (* default: false  *)
+  LL_OPTION_DISABLEPRINT_MENU    = 434;
+                    (* default: 0 *)
+  LL_OPTION_DISABLEPRINT_MENU_PRINT = $01;
+                    (* disable menu item  *)
+  LL_OPTION_DISABLEPRINT_MENU_PRINTQUICK = $02;
+                    (* disable menu item  *)
+  LL_OPTION_DISABLEPRINT_MENU_PAGE1 = $04;
+                    (* disable menu item  *)
+  LL_OPTION_DISABLEPRINT_MENU_PAGEN = $08;
+                    (* disable menu item  *)
+  LL_OPTION_DISABLEPRINT_MENU_DUMMY = $10;
+                    (* disable menu item  *)
+  LL_OPTION_DISABLEPRINT_MENU_PREVIEW = $20;
+                    (* disable menu item  *)
+  LL_OPTION_DISABLEPRINT_MENU_ALL = $FF;
+                    (* disable menu item (mask all)  *)
+  LL_OPTION_RIBBON_FORCEENABLED  = 435;
+                    (* default: false *)
+  LL_OPTION_COMPAT_ALLOW_SUBTABLECOLUMNS = 436;
                     (* default: false *)
   LL_OPTIONSTR_LABEL_PRJEXT      = 0;
                     (* internal... (compatibility to L6) *)
@@ -2353,7 +2398,6 @@ const
                     (* body only *)
   LL_GETCHARTOBJECTCOUNT_CHARTCOLUMNS_FOOTERS = 4;
   LL_VARIANTFLAG_NEUTRAL         = $00000000;
-  LL_VARIANTFLAG_USE_JULIAN_DATE = $00000001;
   LL_GRIPT_DIM_SCM               = 1;
   LL_GRIPT_DIM_PERC              = 2;
   LL_PARAMETERFLAG_PUBLIC        = $00000000;
@@ -2460,6 +2504,7 @@ const
   LLJOBOPENCOPYEXFLAG_NO_COPY_DBSTRUCTS = $0002;
   LLJOBOPENCOPYEXFLAG_NO_COPY_XLATTABLES = $0004;
   LLJOBOPENCOPYEXFLAG_NO_COPY_LLXPARAMETERS = $0008;
+  LLJOBOPENCOPYEXFLAG_FORCE_COPY_EXPORTLIMITATIONS = $8000;
   LL_DOM_CURRENT_OBJECT_LEVEL_OBJECT = 0;
   LL_DOM_CURRENT_OBJECT_LEVEL_CONTAINERITEM = 1;
   LL_DOM_CURRENT_OBJECT_LEVEL_FIELD = 2;
@@ -3904,6 +3949,11 @@ type
 	(_hDOMObj:         HLLDOMOBJ;
 	 _pnCount:         _LPINTJAVADUMMY
 	): integer; stdcall;
+  pfnLlDomGetPropertyBSTR= function  
+	(_hDOMObj:         HLLDOMOBJ;
+	 _pszName:         pWCHAR;
+	 _pbsValue:        _PBSTR
+	): integer; stdcall;
   pfnLlAssociatePreviewControl= function  
 	(_hLlJob:          HLLJOB;
 	 _hWndControl:     HWND;
@@ -4049,6 +4099,11 @@ type
 	 _nBufSize:        cardinal;
 	 _bWithCompression:                longbool
 	): integer; stdcall;
+  pfnLlConvertStreamToBSTR= function  
+	(_pStream:         _PISTREAM;
+	 _pbsResult:       _PBSTR;
+	 _bWithCompression:                longbool
+	): integer; stdcall;
   pfnLlConvertStringToStreamA= function  
 	(_pszText:         pCHAR;
 	 _pStream:         _PISTREAM
@@ -4067,6 +4122,11 @@ type
 	(_hMemory:         tHandle;
 	 _pszBuffer:       pWCHAR;
 	 _nBufSize:        cardinal;
+	 _bWithCompression:                longbool
+	): integer; stdcall;
+  pfnLlConvertHGLOBALToBSTR= function  
+	(_hMemory:         tHandle;
+	 _pbsResult:       _PBSTR;
 	 _bWithCompression:                longbool
 	): integer; stdcall;
   pfnLlConvertStringToHGLOBALA= function  
@@ -4438,15 +4498,6 @@ type
   pfnLlExprTypeMask      = function  
 	(_hLlJob:          HLLJOB;
 	 _lpExpr:          HLLEXPR
-	): integer; stdcall;
-  pfnLlStgTestJobCmpEmbeddedStorages2= function  
-	(_hJob:            HLLTESTJOB;
-	 _pvErrors:        PVARIANT;
-	 _pvarListOfProblematicStorages:                PVARIANT
-	): integer; stdcall;
-  pfnLlStgTestJobAddResultJobs= function  
-	(_hJob:            HLLTESTJOB;
-	 _pvarListOfProblematicStorages:                PCVARIANT
 	): integer; stdcall;
   pfnLlStgCreateFrom     = function  
 	(_hJob:            HLLJOB;
@@ -5555,6 +5606,7 @@ const
   {$endif}
    LlProjectClose: pfnLlProjectClose = NIL;
    LlDomGetPropertyCount: pfnLlDomGetPropertyCount = NIL;
+   LlDomGetPropertyBSTR: pfnLlDomGetPropertyBSTR = NIL;
    LlAssociatePreviewControl: pfnLlAssociatePreviewControl = NIL;
   {$ifdef UNICODE}
       LlGetErrortextO: pfnLlGetErrortextA = NIL;
@@ -5661,6 +5713,7 @@ const
      {$else}
       LlConvertStreamToStringO: pfnLlConvertStreamToStringW = NIL;
   {$endif}
+   LlConvertStreamToBSTR: pfnLlConvertStreamToBSTR = NIL;
   {$ifdef UNICODE}
       LlConvertStringToStreamO: pfnLlConvertStringToStreamA = NIL;
      {$else}
@@ -5681,6 +5734,7 @@ const
      {$else}
       LlConvertHGLOBALToStringO: pfnLlConvertHGLOBALToStringW = NIL;
   {$endif}
+   LlConvertHGLOBALToBSTR: pfnLlConvertHGLOBALToBSTR = NIL;
   {$ifdef UNICODE}
       LlConvertStringToHGLOBALO: pfnLlConvertStringToHGLOBALA = NIL;
      {$else}
@@ -5842,8 +5896,6 @@ const
    LlProjectFindAndReplace: pfnLlProjectFindAndReplace = NIL;
    LlExprParseQueryDelayedDefine: pfnLlExprParseQueryDelayedDefine = NIL;
    LlExprTypeMask: pfnLlExprTypeMask = NIL;
-   LlStgTestJobCmpEmbeddedStorages2: pfnLlStgTestJobCmpEmbeddedStorages2 = NIL;
-   LlStgTestJobAddResultJobs: pfnLlStgTestJobAddResultJobs = NIL;
    LlStgCreateFrom: pfnLlStgCreateFrom = NIL;
    LlRemoveIdentifier: pfnLlRemoveIdentifier = NIL;
    LlExprParseEx: pfnLlExprParseEx = NIL;
@@ -6958,6 +7010,7 @@ begin
       {$endif}
       @LlProjectClose       := GetProcAddress(hDLLLL30,'LlProjectClose');
       @LlDomGetPropertyCount := GetProcAddress(hDLLLL30,'LlDomGetPropertyCount');
+      @LlDomGetPropertyBSTR := GetProcAddress(hDLLLL30,'LlDomGetPropertyBSTR');
       @LlAssociatePreviewControl := GetProcAddress(hDLLLL30,'LlAssociatePreviewControl');
       {$ifdef UNICODE}
           @LlGetErrortextO := GetProcAddress(hDLLLL30,'LlGetErrortextA');
@@ -7064,6 +7117,7 @@ begin
         {$else}
           @LlConvertStreamToStringO := GetProcAddress(hDLLLL30,'LlConvertStreamToStringW');
       {$endif}
+      @LlConvertStreamToBSTR := GetProcAddress(hDLLLL30,'LlConvertStreamToBSTR');
       {$ifdef UNICODE}
           @LlConvertStringToStreamO := GetProcAddress(hDLLLL30,'LlConvertStringToStreamA');
         {$else}
@@ -7084,6 +7138,7 @@ begin
         {$else}
           @LlConvertHGLOBALToStringO := GetProcAddress(hDLLLL30,'LlConvertHGLOBALToStringW');
       {$endif}
+      @LlConvertHGLOBALToBSTR := GetProcAddress(hDLLLL30,'LlConvertHGLOBALToBSTR');
       {$ifdef UNICODE}
           @LlConvertStringToHGLOBALO := GetProcAddress(hDLLLL30,'LlConvertStringToHGLOBALA');
         {$else}
@@ -7245,8 +7300,6 @@ begin
       @LlProjectFindAndReplace := GetProcAddress(hDLLLL30,'LlProjectFindAndReplace');
       @LlExprParseQueryDelayedDefine := GetProcAddress(hDLLLL30,'LlExprParseQueryDelayedDefine');
       @LlExprTypeMask       := GetProcAddress(hDLLLL30,'LlExprTypeMask');
-      @LlStgTestJobCmpEmbeddedStorages2 := GetProcAddress(hDLLLL30,'LlStgTestJobCmpEmbeddedStorages2');
-      @LlStgTestJobAddResultJobs := GetProcAddress(hDLLLL30,'LlStgTestJobAddResultJobs');
       @LlStgCreateFrom      := GetProcAddress(hDLLLL30,'LlStgCreateFrom');
       @LlRemoveIdentifier   := GetProcAddress(hDLLLL30,'LlRemoveIdentifier');
       @LlExprParseEx        := GetProcAddress(hDLLLL30,'LlExprParseEx');
@@ -7737,6 +7790,7 @@ begin
       LlProjectSaveCopyAsO := NIL;
       LlProjectClose := NIL;
       LlDomGetPropertyCount := NIL;
+      LlDomGetPropertyBSTR := NIL;
       LlAssociatePreviewControl := NIL;
       LlGetErrortext := NIL;
       LlGetErrortextO := NIL;
@@ -7783,6 +7837,7 @@ begin
       LlConvertStreamToStringO := NIL;
       LlConvertStreamToString := NIL;
       LlConvertStreamToStringO := NIL;
+      LlConvertStreamToBSTR := NIL;
       LlConvertStringToStream := NIL;
       LlConvertStringToStreamO := NIL;
       LlConvertStringToStream := NIL;
@@ -7791,6 +7846,7 @@ begin
       LlConvertHGLOBALToStringO := NIL;
       LlConvertHGLOBALToString := NIL;
       LlConvertHGLOBALToStringO := NIL;
+      LlConvertHGLOBALToBSTR := NIL;
       LlConvertStringToHGLOBAL := NIL;
       LlConvertStringToHGLOBALO := NIL;
       LlConvertStringToHGLOBAL := NIL;
@@ -7880,8 +7936,6 @@ begin
       LlProjectFindAndReplace := NIL;
       LlExprParseQueryDelayedDefine := NIL;
       LlExprTypeMask := NIL;
-      LlStgTestJobCmpEmbeddedStorages2 := NIL;
-      LlStgTestJobAddResultJobs := NIL;
       LlStgCreateFrom := NIL;
       LlRemoveIdentifier := NIL;
       LlExprParseEx := NIL;
