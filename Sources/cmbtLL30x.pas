@@ -4540,8 +4540,11 @@ type
 	 _pszBuffer:       pWCHAR;
 	 _nBufSize:        cardinal
 	): integer; stdcall;
-
+{$if CompilerVersion < 37}
 const
+{$ELSE}
+var
+{$IFEND}
    LlJobOpen: pfnLlJobOpen = NIL;
    LlJobOpenLCID: pfnLlJobOpenLCID = NIL;
    LlJobClose: pfnLlJobClose = NIL;

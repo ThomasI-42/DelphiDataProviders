@@ -14,7 +14,10 @@ unit l30FireDACInterfaces;
 
 
 interface
+{$if CompilerVersion < 37}
 {$WEAKPACKAGEUNIT ON}
+{$IFEND}
+
 
 uses
 	windows,

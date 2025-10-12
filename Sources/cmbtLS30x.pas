@@ -1081,7 +1081,11 @@ type
 	 _nCMBTLanguage:   integer
 	): longbool; stdcall;
 
+{$if CompilerVersion < 37}
 const
+{$ELSE}
+var
+{$IFEND}
   {$ifdef UNICODE}
       LlStgsysStorageOpenO: pfnLlStgsysStorageOpenA = NIL;
      {$else}
