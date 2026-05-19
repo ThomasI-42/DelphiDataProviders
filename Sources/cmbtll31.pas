@@ -1,6 +1,6 @@
 (* Pascal/Delphi constants and function definitions for LL31.DLL *)
 (*  (c) combit GmbH *)
-(*  [build of 2025-12-08 14:12:03] *)
+(*  [build of 2026-04-29 23:04:55] *)
 
 unit cmbtLL31;
 
@@ -2021,6 +2021,8 @@ const
                     (* default: false *)
   LL_OPTION_COMPAT_ALLOW_SUBTABLECOLUMNS = 436;
                     (* default: false *)
+  LL_OPTION_PROHIBITSHELLEXECUTE = 438;
+                    (* default: true *)
   LL_OPTIONSTR_LABEL_PRJEXT      = 0;
                     (* internal... (compatibility to L6) *)
   LL_OPTIONSTR_LABEL_PRVEXT      = 1;
@@ -2163,6 +2165,8 @@ const
                     (* default: combit2 (empty equals use of project scheme) *)
   LL_OPTIONSTR_TIMEZONE_DATABASE = 95;
   LL_OPTIONSTR_TIMEZONE_CLIENT   = 96;
+  LL_OPTIONSTR_ALLOWED_LLXOBJECTS = 105;
+                    (* all, if empty string (otherwise, ";" separated) *)
   LL_SYSCOMMAND_MINIMIZE         = -1;
   LL_SYSCOMMAND_MAXIMIZE         = -2;
   LL_PHFG_AGGREGATE              = $01;

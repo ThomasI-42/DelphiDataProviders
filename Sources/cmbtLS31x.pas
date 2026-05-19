@@ -1,6 +1,6 @@
 (* Pascal/Delphi runtime linkage constants and function definitions for LS31.DLL *)
 (*  (c) combit GmbH *)
-(*  [build of 2025-10-27 23:10:35] *)
+(*  [build of 2026-02-13 22:02:49] *)
 
 unit cmbtLS31x;
 
@@ -246,6 +246,7 @@ const
                     (* r/o *)
   LS_OPTION_CONBINATIONPRINT_DESCRIPTION = 127;
                     (* r/o *)
+  LS_OPTION_PROHIBITSHELLEXECUTE = 128;
   LS_PRINTFLAG_FIT               = $00000001;
   LS_PRINTFLAG_STACKEDCOPIES     = $00000002;
                     (* n times page1, n times page2, ... (else n times (page 1...x)) *)

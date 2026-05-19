@@ -6,7 +6,7 @@
  File   : ListLabel31.pas
  Module : List & Label 31
  Descr. : Implementation file for the List & Label 31 VCL-Component
- Version: 31.001
+ Version: 31.002
 ==================================================================================
 }
 
@@ -2791,7 +2791,8 @@ Var
   DataProviderIntf : TDataProviderInterfaceProxyRoot;
   DataProvider     : TDataSetDataProvider;
   LlProjectType: Integer;
-
+  nCopies: Integer;
+  nRet: Integer;
   ProjectFilename: TString;
   ShowSelectFile: Boolean;
   ShowPrintOptions: Boolean;
@@ -2804,7 +2805,7 @@ begin
   DeclareLlXObjectsToLL;
   DataProvider:=Nil;
   OldMaster := false;
-
+  nCopies:= 1;
   If (Core.Options <> nil) Then
   begin
 
@@ -2926,6 +2927,12 @@ begin
           begin
             LlPrintSetOption(CurrentJobHandle, LL_PRNOPT_PRINTDLG_ONLYPRINTERCOPIES, 1);
             ok := CheckError(LLPrintOptionsDialog(CurrentJobHandle, WindowHandle, PChar(FAutoDialogTitle))) = CE_OK;
+              if (AutoProjectType = TLlProject.ptLabel)then
+              begin
+                nCopies := LlPrintGetOption(CurrentJobHandle, LL_OPTION_COPIES);
+                LlPrintSetOption(CurrentJobHandle, LL_PRNOPT_COPIES, 1);
+				LlPrintSetOption(CurrentJobHandle, LL_PRNOPT_COUNT_OF_ITEMS, nCopies);
+              end;
           end;
 
           if not(ok) then
@@ -2948,9 +2955,11 @@ begin
           if Assigned(FOnAutoDefineNewPage) and (AutoProjectType = TLlProject.ptList) then
             OnAutoDefineNewPage(self, False);
 
-          while (LlPrint(CurrentJobHandle) = LL_WRN_REPEAT_DATA) and (LlPrintGetOption(CurrentJobHandle, LL_PRNOPT_PAGEINDEX) < LlPrintGetOption(CurrentJobHandle, LL_PRNOPT_LASTPAGE)) do
+          while (LlPrint(CurrentJobHandle) = LL_WRN_REPEAT_DATA) and
+                (LlPrintGetOption(CurrentJobHandle, LL_PRNOPT_PAGEINDEX) <
+                 LlPrintGetOption(CurrentJobHandle, LL_PRNOPT_LASTPAGE)) do
           begin
-          if Assigned(FOnAutoDefineNewPage) and (AutoProjectType = TLlProject.ptList) then
+            if Assigned(FOnAutoDefineNewPage) then
               OnAutoDefineNewPage(self, False);
           end;
 
@@ -4361,12 +4370,24 @@ end;
 
 function TLlDesignerObject31._AddRef: Integer;
 begin
+    if (csDesigning in ComponentState) then
+    begin
+          result:= 0;
+          exit;
+    end;
+
   	Result := InterlockedIncrement(FRefCount);
     InterlockedIncrement(l31FireDACInterfaces.g_nObjects);
 end;
 
 function TLlDesignerObject31._Release: Integer;
 begin
+    if (csDesigning in ComponentState) then
+    begin
+          result:= 0;
+          exit;
+    end;
+
     InterlockedDecrement(l31FireDACInterfaces.g_nObjects);
   	Result := InterlockedDecrement(FRefCount);
     if (Result = 0) then
