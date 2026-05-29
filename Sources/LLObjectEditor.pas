@@ -4,18 +4,16 @@
 
 ----------------------------------------------------------------------------------
  File   : LLObjectEditor.pas
- Module : List & Label 30
- Descr. : Implementation file for the List & Label 30 VCL-Component
- Version: 30.000
+ Module : List & Label 31
+ Descr. : Implementation file for the List & Label 31 VCL-Component
+ Version: 31.001
+
 ==================================================================================
 }
 
 unit LLObjectEditor;
 
 interface
-{$if CompilerVersion < 37}
-{$WEAKPACKAGEUNIT ON}
-{$IFEND}
 uses
   Windows, Messages, SysUtils, Classes, Graphics,
   Controls, Dialogs, Forms, DesignIntf, ObjTree, Vcl.ComCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.ActnList,

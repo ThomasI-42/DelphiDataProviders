@@ -4,16 +4,17 @@
 
 ----------------------------------------------------------------------------------
  File   : LLDataSetDataProvider.pas
- Module : List & Label 30
- Descr. : Implementation file for the List & Label 30 VCL-Component
- Version: 30.000
+ Module : List & Label 31
+ Descr. : Implementation file for the List & Label 31 VCL-Component
+ Version: 31.001
+
 ==================================================================================
 }
 
 unit LLDataSetDataProvider;
 
 interface
-{$WEAKPACKAGEUNIT ON}
+
 uses LLDataProvider,
      Vcl.StdCtrls, Data.DB, Classes,
      system.Generics.Collections,
@@ -184,7 +185,7 @@ const
     '{\f0\fswiss\fcharset0 Arial;}}\viewkind4\uc1\pard\f0\fs20\par}';
 
 implementation
-uses Sysutils, cmbtll30x, Windows, dialogs, vcl.graphics, vcl.imaging.jpeg;
+uses Sysutils, cmbtll31x, Windows, dialogs, vcl.graphics, vcl.imaging.jpeg;
 
 Constructor TDataSetDescription.Create(ADataset: TDataSet; AKeyField: String; ASortDescription: String; AFilter: String  );
 Begin
