@@ -142,10 +142,10 @@ type
  scLlDrawUserObj = record
   _nSize: integer;    (* size of the structure *)
   _pszName: pTchar;    (* name of the variable *)
-  _pszContents: pTchar;   (* contents of the variable (valid if def´d by VariableExt()) *)
+  _pszContents: pTchar;   (* contents of the variable (valid if defï¿½d by VariableExt()) *)
   _lPara: lParam;     (* lPara of the variable *)
   _lpPtr: pchar;     (* lpPtr of the variable *)
-  _hPara: thandle;    (* hContents of the variable (valid if def´d by VariableExtHandle()) *)
+  _hPara: thandle;    (* hContents of the variable (valid if defï¿½d by VariableExtHandle()) *)
   _bIsotropic: longbool;    (* "Isotropic" flag *)
   _pszParameters: pTchar;   (* parameters (for USERDWGEDITABLE objects) *)
   _hRefDC: hdc;      (* HDC to get information from *)
@@ -160,7 +160,7 @@ type
   _pszName: pTchar;    (* name of the variable *)
   _lPara: lParam;     (* lPara of the variable *)
   _lpPtr: pTchar;     (* lpPtr of the variable *)
-  _hPara: thandle;    (* hContents of the variable (valid if def´d by VariableExtHandle()) *)
+  _hPara: thandle;    (* hContents of the variable (valid if defï¿½d by VariableExtHandle()) *)
   _bIsotropic: longbool;    (* "Isotropic" flag *)
   _hWnd: hWnd;     (* parent window for dialog *)
   _pszParameters: pTchar;   (* parameter buffer *)
@@ -2360,11 +2360,11 @@ const
   LL_CHAR_PHANTOMSPACE           = $200b;
   LL_CHAR_LOCK                   = $2060;
   LL_CHAR_NEWLINE                = 182;
-                    (* "¶" *)
+                    (* "ï¿½" *)
   LL_CHAR_EXPRSEP                = 164;
-                    (* "¤" *)
+                    (* "ï¿½" *)
   LL_CHAR_TAB                    = 247;
-                    (* "÷" *)
+                    (* "ï¿½" *)
   LL_CHAR_EAN128NUL              = 255;
   LL_CHAR_EAN128FNC1             = 254;
   LL_CHAR_EAN128FNC2             = 253;
@@ -4540,12 +4540,11 @@ type
 	 _pszBuffer:       pWCHAR;
 	 _nBufSize:        cardinal
 	): integer; stdcall;
-
 {$if CompilerVersion < 37}
 const
-{$else}
+{$ELSE}
 var
-{$ifend}
+{$IFEND}
    LlJobOpen: pfnLlJobOpen = NIL;
    LlJobOpenLCID: pfnLlJobOpenLCID = NIL;
    LlJobClose: pfnLlJobClose = NIL;

@@ -13,7 +13,9 @@
 unit LLObjectEditor;
 
 interface
-
+{$if CompilerVersion < 37}
+{$WEAKPACKAGEUNIT ON}
+{$IFEND}
 uses
   Windows, Messages, SysUtils, Classes, Graphics,
   Controls, Dialogs, Forms, DesignIntf, ObjTree, Vcl.ComCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.ActnList,

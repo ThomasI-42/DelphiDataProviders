@@ -1,6 +1,6 @@
 {=================================================================================
 
- Copyright © combit GmbH, Konstanz
+ Copyright ï¿½ combit GmbH, Konstanz
 
 ----------------------------------------------------------------------------------
  File   : L30FireDACInterfaces.pas
@@ -14,6 +14,10 @@ unit l30FireDACInterfaces;
 
 
 interface
+{$if CompilerVersion < 37}
+{$WEAKPACKAGEUNIT ON}
+{$IFEND}
+
 
 uses
 	windows,

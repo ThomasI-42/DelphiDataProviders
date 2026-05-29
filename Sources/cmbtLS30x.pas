@@ -1083,9 +1083,9 @@ type
 
 {$if CompilerVersion < 37}
 const
-{$else}
+{$ELSE}
 var
-{$ifend}
+{$IFEND}
   {$ifdef UNICODE}
       LlStgsysStorageOpenO: pfnLlStgsysStorageOpenA = NIL;
      {$else}
